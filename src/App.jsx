@@ -1,5 +1,5 @@
 
-import Day7 from './components/Day7'
+import Day8 from './components/Day8'
 function App() {
   
 
@@ -10,7 +10,8 @@ function App() {
     {/* <Day4/> */}
     {/* <Day5/> */}
     {/* <Day6/> */}
-    <Day7/>
+    {/* <Day7/> */}
+    <Day8/>
 
     </>
   )
