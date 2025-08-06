@@ -1,5 +1,5 @@
 
-import Day8 from './components/Day8'
+import Parent from './components/Day9/Parent'
 function App() {
   
 
@@ -11,7 +11,8 @@ function App() {
     {/* <Day5/> */}
     {/* <Day6/> */}
     {/* <Day7/> */}
-    <Day8/>
+    {/* <Day8/> */}
+    <Parent/>
 
     </>
   )
