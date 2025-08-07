@@ -1,21 +1,36 @@
-export default function ButtonGroup({ addValue, removeValue, resetValue, limit }) {
+type ButtonGroupProps = {
+  addValue: () => void;
+  removeValue: () => void;
+  resetValue: () => void;
+  limit: boolean;
+};
+
+export default function ButtonGroup({
+  addValue,
+  removeValue,
+  resetValue,
+  limit,
+}: ButtonGroupProps) {
   return (
     <div className="flex flex-col items-start">
-      
-      <button 
+      <button
         onClick={addValue}
         disabled={limit}
         className="bg-red-300 p-2 text-2xl rounded-2xl m-2 cursor-pointer hover:bg-blue-200 disabled:bg-gray-400"
       >
         Increase Value
       </button>
-      <button 
+
+      <button
         onClick={removeValue}
-        className="bg-red-300 p-2 text-2xl rounded-2xl m-2 cursor-pointer hover:bg-blue-200"
+        className={`bg-red-300 p-2 text-2xl rounded-2xl m-2 cursor-pointer hover:bg-blue-200 ${
+          limit ? "opacity-60" : ""
+        }`}
       >
         Decrease Value
       </button>
-      <button 
+
+      <button
         onClick={resetValue}
         className="bg-red-300 p-2 text-2xl rounded-2xl m-2 cursor-pointer hover:bg-blue-200"
       >
