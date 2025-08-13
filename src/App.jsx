@@ -2,8 +2,9 @@
 // import {Parent as Day9} from './components/Day9/Parent'
 
 // import Day10 from './components/Day10/Day10'
-import Parent from './components/Day11/Parent.tsx'
-import GetData from './components/Task/UserCard.tsx'
+// import Parent from './components/Day11/Parent.tsx'
+// import GetData from './components/Task/UserCard.tsx'
+import UserCard from './components/Day13/UserCard.tsx'
 function App() {
   
 
@@ -19,7 +20,9 @@ function App() {
     {/* <Day9/> */}
     {/* <Day10/> */}
     {/* <Parent/> */}
-    <GetData/>
+    {/* <GetData/> */}
+    <UserCard/>
+
     
     
 
