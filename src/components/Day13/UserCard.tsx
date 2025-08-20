@@ -15,7 +15,9 @@ function UserCard() {
   const [search, setSearch] = useState<string>("");
   const [users, setUsers] = useState<UserInterface[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [sortOrder, setSortOrder] = useState<"A-Z" | "Z-A" | "Online" | "Offline">("A-Z");
+  const [sortOrder, setSortOrder] = useState<
+    "A-Z" | "Z-A" | "Online" | "Offline"
+  >("A-Z");
 
   // child → parent
   const getSearchValue = (searchValue: string) => {
@@ -39,7 +41,7 @@ function UserCard() {
     fetchData();
   }, []);
 
-  // Filtered users
+  // Filtered users (search)
   const filteredUsers = useMemo(() => {
     return users.filter((user) => {
       const fullName = `${user.name.first} ${user.name.last}`.toLowerCase();
@@ -47,31 +49,39 @@ function UserCard() {
     });
   }, [users, search]);
 
-  // Sorted users
+  // Sorted + Online/Offline filter
   const sortedUsers = useMemo(() => {
-    let sorted = [...filteredUsers];
+    let temp = [...filteredUsers];
 
     if (sortOrder === "A-Z") {
-      sorted.sort((a, b) => a.name.first.localeCompare(b.name.first));
+      temp.sort((a, b) => a.name.first.localeCompare(b.name.first));
     } else if (sortOrder === "Z-A") {
-      sorted.sort((a, b) => b.name.first.localeCompare(a.name.first));
+      temp.sort((a, b) => b.name.first.localeCompare(a.name.first));
     } else if (sortOrder === "Online") {
-      sorted.sort((a, b) => Number(b.gender === "male") - Number(a.gender === "male"));
+      temp = temp.filter((user) => user.gender === "male"); // mock online
     } else if (sortOrder === "Offline") {
-      sorted.sort((a, b) => Number(a.gender === "male") - Number(b.gender === "male"));
+      temp = temp.filter((user) => user.gender === "female"); // mock offline
     }
 
-    return sorted;
+    return temp;
   }, [filteredUsers, sortOrder]);
+  
+  const onButtonClear = () => {
+      setSearch("")
+  };
 
   return (
     <>
-      <SearchBar onSearchChange={getSearchValue} />
+      <SearchBar 
+      searchVal={search}
+      onButton={onButtonClear}
+      onSearchChange={getSearchValue} />
 
       {loading ? (
         <p>Loading...</p>
       ) : (
         <>
+          <label className="mr-2 font-semibold">Sort / Filter:</label>
           <select
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value as typeof sortOrder)}
@@ -83,18 +93,20 @@ function UserCard() {
             <option value="Offline">Offline</option>
           </select>
 
-          {sortedUsers.map((user, idx) => (
-            <Card
-              key={idx}
-              name={`${user.name.first} ${user.name.last}`}
-              email={user.email}
-              gender={user.gender}
-              phone={user.phone}
-              pincode={user.location.postcode}
-              image={user.picture.large}
-              isOnline={user.gender === "male"} // just a mock for now
-            />
-          ))}
+          <div className="grid gap-4">
+            {sortedUsers.map((user, idx) => (
+              <Card
+                key={idx}
+                name={`${user.name.first} ${user.name.last}`}
+                email={user.email}
+                gender={user.gender}
+                phone={user.phone}
+                pincode={user.location.postcode}
+                image={user.picture.large}
+                isOnline={user.gender === "male"} // just a mock
+              />
+            ))}
+          </div>
         </>
       )}
     </>

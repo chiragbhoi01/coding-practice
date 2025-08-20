@@ -1,27 +1,27 @@
-import  { useState } from "react";
-import Card from "./Card";
+import React from "react";
 
-type searchType = {
-    onSearchChange :(serachValue : string) => void
+interface Props {
+  searchVal: string;
+  onSearchChange: (val: string) => void;
+  onButton: () => void;
 }
-function SearchBar({
-    onSearchChange
-} : searchType) {
-  
 
+function SearchBar({ searchVal, onSearchChange, onButton }: Props) {
   return (
-    <div>
-      <div>
-        <input
-          type="text"
-          name="search"
-          placeholder="search users........"
-          className="border-2 rounded-2xl p-2"
-          
-          onChange={(e) => onSearchChange(e.target.value)}
-        />
-      </div>
-      
+    <div className="flex gap-2 mb-4">
+      <input
+        type="text"
+        value={searchVal}
+        onChange={(e) => onSearchChange(e.target.value)}
+        className="border p-2 rounded w-full"
+        placeholder="Search users..."
+      />
+      <button
+        onClick={onButton}
+        className="bg-blue-200 p-2 rounded-2xl cursor-pointer hover:bg-red-500"
+      >
+        Clear
+      </button>
     </div>
   );
 }
