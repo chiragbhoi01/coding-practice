@@ -21,10 +21,11 @@ function ParentCard() {
 
   const USERS_PER_PAGE = 6;
 
+  // ✅ Fetch users
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch("https://randomuser.me/api/?results=20");
+        const response = await fetch("https://randomuser.me/api/?results=100");
         const data = await response.json();
         setUsers(data.results || []);
       } catch (err) {
@@ -36,23 +37,17 @@ function ParentCard() {
     fetchUsers();
   }, []);
 
-  const searchValue = (val: string) => setSearch(val);
-  const sortData = (val: string) => setSort(val);
-
-  // 🔎 search filter
+  // ✅ Search filter
   const filterUser = useMemo(() => {
+    const query = search.toLowerCase();
     return users.filter((user) => {
-      const query = search.toLowerCase();
       const fullName = `${user.name.first} ${user.name.last}`.toLowerCase();
-      const email = user.email.toLowerCase()
-      const phone = user.phone.toLowerCase()
-      return (
-        fullName.includes(query) || email.includes(query)
-      );
+      const email = user.email.toLowerCase();
+      return fullName.includes(query) || email.includes(query);
     });
   }, [users, search]);
 
-  // 🔽 sorting logic
+  // ✅ Sorting logic
   const sorting = useMemo(() => {
     let sorted = [...filterUser];
 
@@ -65,52 +60,72 @@ function ParentCard() {
         b.name.first.localeCompare(a.name.first, "en", { sensitivity: "base" })
       );
     } else if (sort === "Online") {
-      sorted = sorted.filter((user) => user.gender === "male"); // mock online
+      sorted = sorted.filter((user) => user.gender === "male"); // mock
     } else if (sort === "Offline") {
-      sorted = sorted.filter((user) => user.gender === "female"); // mock offline
+      sorted = sorted.filter((user) => user.gender === "female"); // mock
     }
 
     return sorted;
   }, [filterUser, sort]);
 
-  // ✅ Pagination slice
+  // ✅ Pagination
+  const totalPages = Math.ceil(sorting.length / USERS_PER_PAGE);
   const start = (currentPage - 1) * USERS_PER_PAGE;
-  const end = start + USERS_PER_PAGE;
-  const pageUsers = sorting.slice(start, end);
+  const pageUsers = sorting.slice(start, start + USERS_PER_PAGE);
 
-  // ✅ Pagination handlers
+  // ✅ Pagination helpers
   const handleNextPage = () => {
-    if (currentPage < Math.ceil(sorting.length / USERS_PER_PAGE)) {
-      setCurrentPage((prev) => prev + 1);
-    }
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   };
-
   const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+  const jumpToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
-  // ✅ Reset page when search/sort changes
+  // ✅ Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [search, sort]);
 
+  // ✅ Clear filters
   const clearFilter = () => {
     setSearch("");
     setSort("All");
   };
 
-  const totalPages = Math.ceil(sorting.length / USERS_PER_PAGE);
-  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+  // ✅ Ellipsis pagination logic
+  const getPageNumbers = (): (number | string)[] => {
+    const pages: (number | string)[] = [];
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+
+    pages.push(1);
+
+    if (currentPage > 3) pages.push("...");
+
+    for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+      if (i > 1 && i < totalPages) pages.push(i);
+    }
+
+    if (currentPage < totalPages - 2) pages.push("...");
+
+    pages.push(totalPages);
+    return pages;
+  };
+
+  const resultInfo = `Page ${currentPage} of ${totalPages} — showing ${pageUsers.length} of ${sorting.length} results`;
 
   if (error) return <h1 className="text-red-500 text-5xl">{error}</h1>;
 
   return (
     <>
+      {/* 🔎 Search & Sort */}
       <SearchBar
         onButtonChange={clearFilter}
-        onSearchChange={searchValue}
+        onSearchChange={setSearch}
         value={search}
-        getSortData={sortData}
+        getSortData={setSort}
         selectValue={sort}
       />
 
@@ -118,7 +133,7 @@ function ParentCard() {
         <h1>Loading......</h1>
       ) : (
         <>
-          {/* User Cards */}
+          {/* 🧑‍💻 User Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
             {pageUsers.map((user) => (
               <Card
@@ -128,15 +143,30 @@ function ParentCard() {
                 image={user.picture.medium}
                 phone={user.phone}
                 gender={user.gender}
-                isOnline={user.gender === "male"} // ✅ mock online/offline
+                isOnline={user.gender === "male"}
               />
             ))}
           </div>
 
-          {/* ✅ Pagination bar */}
+          {/* 📌 Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 mt-6">
-              {/* Previous */}
+            <div className="flex justify-center items-center gap-2 mt-6 flex-wrap">
+              <button
+                onClick={() => jumpToPage(1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1 rounded bg-gray-300 disabled:opacity-50"
+              >
+                {"<<"}
+              </button>
+
+              <button
+                onClick={() => jumpToPage(currentPage - 2)}
+                disabled={currentPage <= 2}
+                className="px-3 py-1 rounded bg-gray-300 disabled:opacity-50"
+              >
+                -2
+              </button>
+
               <button
                 onClick={handlePrevPage}
                 disabled={currentPage === 1}
@@ -145,22 +175,25 @@ function ParentCard() {
                 Prev
               </button>
 
-              {/* Page numbers */}
-              {pageNumbers.map((num) => (
-                <button
-                  key={num}
-                  onClick={() => setCurrentPage(num)}
-                  className={`px-3 py-1 rounded ${
-                    num === currentPage
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 hover:bg-gray-300"
-                  }`}
-                >
-                  {num}
-                </button>
-              ))}
+              {/* Dynamic page numbers with ellipsis */}
+              {getPageNumbers().map((num, idx) =>
+                typeof num === "number" ? (
+                  <button
+                    key={idx}
+                    onClick={() => jumpToPage(num)}
+                    className={`px-3 py-1 rounded ${
+                      num === currentPage
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 hover:bg-gray-300"
+                    }`}
+                  >
+                    {num}
+                  </button>
+                ) : (
+                  <span key={idx} className="px-3 py-1 text-gray-500">…</span>
+                )
+              )}
 
-              {/* Next */}
               <button
                 onClick={handleNextPage}
                 disabled={currentPage === totalPages}
@@ -168,8 +201,28 @@ function ParentCard() {
               >
                 Next
               </button>
+
+              <button
+                onClick={() => jumpToPage(currentPage + 2)}
+                disabled={currentPage >= totalPages - 1}
+                className="px-3 py-1 rounded bg-gray-300 disabled:opacity-50"
+              >
+                +2
+              </button>
+
+              <button
+                onClick={() => jumpToPage(totalPages)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 rounded bg-gray-300 disabled:opacity-50"
+              >
+                {">>"}
+              </button>
             </div>
           )}
+
+          <div className="text-xl font-bold text-gray-600 mt-2 text-center">
+            {resultInfo}
+          </div>
         </>
       )}
     </>
