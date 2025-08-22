@@ -105,7 +105,7 @@ function ParentCard() {
     if (currentPage > 3) pages.push("...");
 
     for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-      if (i > 1 && i < totalPages) pages.push(i);
+      if (i > 1 && i < totalPages) pages.push(i); 
     }
 
     if (currentPage < totalPages - 2) pages.push("...");
