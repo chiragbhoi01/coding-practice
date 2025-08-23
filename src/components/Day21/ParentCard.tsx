@@ -1,17 +1,19 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 
-type Users = {
+type Gender = "male" | "female" | null;
+
+type User = {
+  id: string;
   name: string;
   email: string;
   phone: string;
-  gender: boolean | null;
-  id: string; // id as string for safe generation
+  gender: Gender;
 };
 
 function ParentCard() {
-  const [newUser, setNewUser] = useState<Users[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [user, setUser] = useState<Users>({
+  const [user, setUser] = useState<User>({
     id: generateId(),
     name: "",
     email: "",
@@ -19,15 +21,17 @@ function ParentCard() {
     gender: null,
   });
   const [userIndex, setUserIndex] = useState<number | null>(null);
+  const [search, setSearch] = useState<string>("");
+
+  // Regex patterns
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^[0-9]{10}$/; // ✅ enforces 10 digit numbers
 
   function generateId() {
     return Math.random().toString(36).substr(2, 9) + Date.now().toString();
   }
 
-  // Validation function returns true or false; sets error message
-  const phoneRegex = /^[0-9]+$/;
-
+  // Validation
   const validation = (): boolean => {
     if (!user.name.trim()) {
       setError("Please enter a valid name");
@@ -38,7 +42,7 @@ function ParentCard() {
       return false;
     }
     if (!user.phone.trim() || !phoneRegex.test(user.phone)) {
-      setError("Please enter a valid phone number (digits only)");
+      setError("Please enter a valid 10-digit phone number");
       return false;
     }
     if (user.gender === null) {
@@ -49,22 +53,22 @@ function ParentCard() {
     return true;
   };
 
-  const addUsers = () => {
-    if (!validation()) {
-      return;
-    }
+  // Add or Update Users
+  const addUser = () => {
+    if (!validation()) return;
 
     if (userIndex !== null) {
-      // Edit existing user
-      const updatedUsers = [...newUser];
+      // ✏️ Edit mode
+      const updatedUsers = [...users];
       updatedUsers[userIndex] = user;
-      setNewUser(updatedUsers);
+      setUsers(updatedUsers);
       setUserIndex(null);
     } else {
-      // Add new user
-      setNewUser([...newUser, user]);
+      // ➕ Add mode
+      setUsers([...users, user]);
     }
 
+    // Reset form
     setUser({
       id: generateId(),
       name: "",
@@ -74,21 +78,39 @@ function ParentCard() {
     });
   };
 
+  // Delete user
   const deleteUser = (id: string) => {
-    const updatedUsers = newUser.filter((user) => user.id !== id);
-    setNewUser(updatedUsers);
+    setUsers(users.filter((u) => u.id !== id));
   };
 
+  // Edit user
   const editUser = (index: number) => {
-    const selectedUser = newUser[index];
-    setUser(selectedUser);
+    setUser(users[index]);
     setUserIndex(index);
   };
 
+  // ✅ Search filtered list
+  const filteredUsers = useMemo(() => {
+    return users.filter((u) =>
+      u.name.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [users, search]);
+
   return (
     <div>
+      {/* Search */}
+      <input
+        type="text"
+        placeholder="Search user"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="mb-4 px-3 py-2 border rounded w-full"
+      />
+
       <h1 className="text-2xl font-bold mb-4">Contact Detail</h1>
       {error && <h3 className="text-red-600 font-semibold mb-4">{error}</h3>}
+
+      {/* Form Fields */}
       <div>
         <Input
           label="Name"
@@ -112,7 +134,7 @@ function ParentCard() {
           name="phone"
         />
 
-        {/* Gender radio buttons */}
+        {/* Gender */}
         <div className="mb-4 flex flex-col">
           <span className="font-semibold mb-1">Gender</span>
           <label className="inline-flex items-center mr-4">
@@ -120,8 +142,8 @@ function ParentCard() {
               type="radio"
               name="gender"
               value="male"
-              checked={user.gender === true}
-              onChange={() => setUser({ ...user, gender: true })}
+              checked={user.gender === "male"}
+              onChange={() => setUser({ ...user, gender: "male" })}
             />
             <span className="ml-1">Male</span>
           </label>
@@ -130,29 +152,30 @@ function ParentCard() {
               type="radio"
               name="gender"
               value="female"
-              checked={user.gender === false}
-              onChange={() => setUser({ ...user, gender: false })}
+              checked={user.gender === "female"}
+              onChange={() => setUser({ ...user, gender: "female" })}
             />
             <span className="ml-1">Female</span>
           </label>
         </div>
       </div>
 
+      {/* Add/Update button */}
       <Button
-        onClick={addUsers}
+        onClick={addUser}
         className="px-4 py-2 bg-blue-500 text-white rounded"
       >
         {userIndex !== null ? "Update User" : "Add User"}
       </Button>
 
-      {/* Display added users */}
+      {/* Users List */}
       <div className="mt-6">
         <h2 className="text-xl font-bold mb-4">Users List</h2>
-        {newUser.length === 0 ? (
-          <p className="text-gray-600">No users added yet.</p>
+        {filteredUsers.length === 0 ? (
+          <p className="text-gray-600">No users found.</p>
         ) : (
           <ul className="space-y-4">
-            {newUser.map((u, index) => (
+            {filteredUsers.map((u, index) => (
               <li
                 key={u.id}
                 className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm border"
@@ -161,7 +184,7 @@ function ParentCard() {
                   {u.name} - {u.email} - {u.phone} -{" "}
                   {u.gender === null
                     ? "Not specified"
-                    : u.gender
+                    : u.gender === "male"
                     ? "Male"
                     : "Female"}
                 </div>
@@ -190,6 +213,7 @@ function ParentCard() {
 
 export default ParentCard;
 
+/* ------------------- Button Component ------------------- */
 type ButtonField = {
   children: string;
   className?: string;
@@ -231,6 +255,7 @@ const Button = ({
   );
 };
 
+/* ------------------- Input Component ------------------- */
 type InputField = {
   label?: string;
   value?: string;
@@ -257,7 +282,7 @@ const Input = ({
   const inputId = label ? label.replace(/\s+/g, "-").toLowerCase() : undefined;
 
   return (
-    <div className={`mb-4 flex flex-col ${className}`}>
+    <div className={`mb-4 flex flex-col max-w-min ${className}`}>
       {label && (
         <label className="font-semibold mb-1" htmlFor={inputId}>
           {label}
