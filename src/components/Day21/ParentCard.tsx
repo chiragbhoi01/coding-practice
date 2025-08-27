@@ -25,7 +25,7 @@ function ParentCard() {
 
   // Regex patterns
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const phoneRegex = /^[0-9]{10}$/; // ✅ enforces 10 digit numbers
+  const phoneRegex = /^[0-9]{10}$/;
 
   function generateId() {
     return Math.random().toString(36).substr(2, 9) + Date.now().toString();
@@ -53,7 +53,7 @@ function ParentCard() {
     return true;
   };
 
-  // Add or Update Users
+  
   const addUser = () => {
     if (!validation()) return;
 
