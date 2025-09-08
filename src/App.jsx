@@ -7,8 +7,8 @@
 // import Parent from './components/Day26/Parent'
 // import CustomerDetails from './components/Day27/CustomerDetails'
 // import TodoApp from './components/Day28/TodoApp'
-import ThemeProvider from './components/Day28/ThemeProvider'
-import ThemeSwitcher from './components/Day28/ThemeSwitcher'
+// import Parent29 from './components/Day29/Parent29'
+import Todo from "./components/Day37/Todo"
 
 function App() {
 
@@ -30,10 +30,10 @@ function App() {
       {/* <ParentCard/> */}
       {/* <Parent/> */}
       {/* <CustomerDetails/> */}
-      <TodoApp />
-      <ThemeProvider>
-        
-      </ThemeProvider>
+      {/* <TodoApp /> */}
+      {/* <Parent29/> */}
+      <Todo/>
+      
 
 
 
