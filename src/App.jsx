@@ -8,7 +8,8 @@
 // import CustomerDetails from './components/Day27/CustomerDetails'
 // import TodoApp from './components/Day28/TodoApp'
 // import Parent29 from './components/Day29/Parent29'
-import Todo from "./components/Day37/Todo"
+// import Todo from "./components/Day37/Todo"
+import TODOAPPDAY45 from "./components/Day45/Day45.tsx"
 
 function App() {
 
@@ -32,7 +33,8 @@ function App() {
       {/* <CustomerDetails/> */}
       {/* <TodoApp /> */}
       {/* <Parent29/> */}
-      <Todo/>
+      {/* <Todo/> */}
+      <TODOAPPDAY45/>
       
 
 
