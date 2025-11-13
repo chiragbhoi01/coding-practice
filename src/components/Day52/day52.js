@@ -37,6 +37,7 @@ function addTodos() {
         return;
     }
     todos.push(todoVal);
+    console.log(todos)
     todoValue.value = "";
     renderTodos();
     localSave();

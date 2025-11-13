@@ -9,9 +9,10 @@
 // import TodoApp from './components/Day28/TodoApp'
 // import Parent29 from './components/Day29/Parent29'
 // import Todo from "./components/Day37/Todo"
-import TODOAPPDAY45 from "./components/Day45/Day45.tsx"
-import TODOAPPDAY49 from "./components/Day49/TodoApp.tsx"
-
+// import TODOAPPDAY45 from "./components/Day45/Day45.tsx"
+// import TODOAPPDAY49 from "./components/Day49/TodoApp.tsx"
+// import TODOAPPDAY53 from "./components/Day53/Todo.tsx"
+import TodoAppNov from "./components/13-nov-2025/13NovTodoApp"
 
 function App() {
 
@@ -38,8 +39,9 @@ function App() {
       {/* <Todo/> */}
       {/* <TODOAPPDAY45/> */}
       {/* <TODOAPPDAY48/> */}
-      <TODOAPPDAY49/>
-        
+      {/* <TODOAPPDAY49/> */}
+      {/* <TODOAPPDAY53/> */}
+        <TodoAppNov/>
       
 
 
